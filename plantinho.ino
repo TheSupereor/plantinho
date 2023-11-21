@@ -2,11 +2,13 @@
 
 int estado = 4;
 const int humidPin = A0;
-// const int buzPin = 3;
+const int butPin = 3;
 const int DispSCL = A4;
 const int DispSCA = A5;
 
-
+// plantas
+int plantsValues[3][2] = {{50, 20}, {60, 30}, {80, 50}};
+String plants[3] = { "cacto", "comum", "suculenta" };
 
 U8GLIB_SSD1306_128X64 u8g(U8G_I2C_OPT_NONE);
 
@@ -57,11 +59,23 @@ void draw() {
 
 void setup() {
   Serial.begin(9600);
-  // dht.begin();
   pinMode(humidPin, INPUT);
+  pinMode(pinoBotao, INPUT_PULLUP);
+  int planta = 0;
 }
 
 void loop() {
+  // mudar planta
+  if(digitalRead(butPin) == HIGH && planta < 2){
+    planta++;
+    u8g.setFont(u8g_font_osb18);
+    u8g.drawStr(20, 20, plants[planta]);
+  }else if(digitalRead(butPin) == HIGH && planta = 2){
+    planta = 0;
+    u8g.setFont(u8g_font_osb18);
+    u8g.drawStr(20, 20, plants[planta]);
+  };
+  
   u8g.firstPage();
   do {
     draw();
@@ -75,13 +89,11 @@ void loop() {
   Serial.println("percent");
   Serial.println(hpercentage);
 
-  if (hpercentage >= 75) {
-    estado = 4;
-  } else if (hpercentage < 74 && hpercentage >= 50) {
-    estado = 1;
-  } else if (hpercentage < 49 && hpercentage >= 25) {
-    estado = 2;
-  } else {
-    estado = 3;
+  if (hpercentage >= plantsValues[planta][0]) {
+    estado = 4; // agua demais
+  } else if (hpercentage < plantsValues[planta][0] && hpercentage >= plantsValues[planta][1]) {
+    estado = 1; // ideal
+  } else if (hpercentage < plantsValues[planta][1]) {
+    estado = 2; // pouca
   }
 }
